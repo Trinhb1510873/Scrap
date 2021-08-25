@@ -86,4 +86,4 @@ def scrap():
 
 
 if __name__ == "__main__":
-    app.run(host='172.16.160.226', port=5005)
+    app.run(host='localhost', port=5005)
