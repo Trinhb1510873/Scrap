@@ -6,7 +6,7 @@ from scrap import scrap_crunchbase, scrap_tetemarche
 
 app = Flask(__name__)
 
-user_agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36'
+user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36'
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
 options.add_argument('user-agent={0}'.format(user_agent))
