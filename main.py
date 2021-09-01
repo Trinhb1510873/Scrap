@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from bs4 import BeautifulSoup
 from scrap import scrap_crunchbase, scrap_tetemarche
+from lxml import etree
 
 app = Flask(__name__)
 
@@ -39,17 +40,17 @@ def scrap():
     html = driver.page_source
 
     soup = BeautifulSoup(html, "html.parser")
-
+    dom = etree.HTML(str(soup))
     data = []
     if 'tetemarche.co.jp' in url:
-        data = scrap_tetemarche(soup)
+        data = scrap_tetemarche(dom)
     elif 'www.crunchbase.com' in url:
-        data = scrap_crunchbase(soup)
+        data = scrap_crunchbase(soup, dom)
 
     driver.quit()
     return {"data": data}
 
 
 if __name__ == "__main__":
-    app.run(host='localhost', port=5005)
+    app.run(host='0.0.0.0', port=5005)
 
