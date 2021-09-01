@@ -1,13 +1,13 @@
-def scrap_tetemarche(soup):
-    dl = soup.find('dl', {'class': 'about-dl'})
-    business_name = dl.find_all('dd', {'class': 'about-dl__dd'})[0].text
-    location = dl.find_all('dd', {'class': 'about-dl__dd'})[1].text
-    found = dl.find_all('dd', {'class': 'about-dl__dd'})[2].text
-    contact = dl.find_all('dd', {'class': 'about-dl__dd'})[3].text
-    director = dl.find_all('dd', {'class': 'about-dl__dd'})[4].text
-    business_content = dl.find_all('dd', {'class': 'about-dl__dd'})[5].text
-    customer = dl.find_all('dd', {'class': 'about-dl__dd'})[6].text
-    access = dl.find_all('dd', {'class': 'about-dl__dd'})[7].text
+def scrap_tetemarche(dom):
+    dl = '//*[@id="main"]/section/div/dl'
+    business_name = dom.xpath(dl + '/dd[1]')[0].text
+    location = dom.xpath(dl +'/dd[2]')[0].text
+    found = dom.xpath(dl + '/dd[3]')[0].text
+    contact = dom.xpath(dl +'/dd[4]')[0].text
+    director = dom.xpath(dl +'/dd[5]')[0].text
+    business_content = dom.xpath(dl + '/dd[6]')[0].text
+    customer = dom.xpath(dl +'/dd[7]')[0].text
+    access = dom.xpath(dl +'/dd[8]/text()')
     return {
         "商号": business_name,
         '所在地': location,
@@ -20,43 +20,22 @@ def scrap_tetemarche(soup):
     }
 
 
-def scrap_crunchbase(soup):
+def scrap_crunchbase(soup, dom):
     data = []
-    sheet_grid = soup.find('sheet-grid')
-    grid_body = sheet_grid.find('grid-body')
-    grid_row_list = grid_body.find_all('grid-row')
-    for grid_row in grid_row_list:
+    for i in range(16):
         row = {}
-        for grid_cell in grid_row.find_all('grid-cell'):
-            column_id = grid_cell.get('data-columnid')
-            div = grid_cell.find('div', class_="cb-absolute-to-cover layout-row layout-align-start-center")
-            if column_id == 'identifier':
-                number = div.find('div', class_="flex-none cb-text-color-medium cb-margin-medium-left ng-star-inserted")
-                if number is not None:
-                    organization_name = div.find('a',
-                                                 class_="component--field-formatter field-type-identifier link-accent ng-star-inserted")
-                    organization_name = number.text + organization_name.text
-                    row['organization_name'] = organization_name
-            elif column_id == 'categories':
-                span = div.find('span', class_="component--field-formatter field-type-identifier-multi")
-                if span is not None:
-                    row['industries'] = span.text
-            elif column_id == 'location_identifiers':
-                span = div.find('span', class_="component--field-formatter field-type-identifier-multi")
-                if span is not None:
-                    row['location'] = span.text
-            elif column_id == 'short_description':
-                span_description = div.find('span',
-                                            class_="component--field-formatter field-type-text_long ng-star-inserted")
-                if span_description is not None:
-                    row['description'] = span_description.text
-            elif column_id == 'rank_org_company':
-                if (div.find('a',
-                             class_="component--field-formatter field-type-integer link-accent ng-star-inserted") is not None):
-                    company = div.find('a',
-                                       class_="component--field-formatter field-type-integer link-accent ng-star-inserted")
-                    row['company'] = company.text
-            else:
-                pass
-        data.append(row)
+        if i > 0:
+            row['organization_name'] = dom.xpath('//sheet-grid/div/div/grid-body/div/grid-row[{0}]/grid-cell[2]/div/field-formatter/identifier-formatter/a/div/div'.format(i))[0].text
+            industries = dom.xpath('//sheet-grid/div/div/grid-body/div/grid-row[{0}]/grid-cell[3]/div/field-formatter/identifier-multi-formatter/span/a/text()'.format(i))
+            industries = ', '.join(str(e) for e in industries)
+            row['industries'] = industries
+            location = dom.xpath('//sheet-grid/div/div/grid-body/div/grid-row[{0}]/grid-cell[4]/div/field-formatter/identifier-multi-formatter/span/a/text()'.format(i))
+            location = ', '.join(str(e) for e in location)
+            row['location'] = location
+            description = dom.xpath('//sheet-grid/div/div/grid-body/div/grid-row[{0}]/grid-cell[5]/div/field-formatter/span'.format(i))[0].text
+            row['description'] = description
+            company = dom.xpath('//sheet-grid/div/div/grid-body/div/grid-row[{0}]/grid-cell[6]/div/field-formatter/a'.format(i))[0].text
+            row['company'] = company
+
+            data.append(row)        
     return data
