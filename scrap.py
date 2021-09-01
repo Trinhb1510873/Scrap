@@ -8,6 +8,7 @@ def scrap_tetemarche(dom):
     business_content = dom.xpath(dl + '/dd[6]')[0].text
     customer = dom.xpath(dl +'/dd[7]')[0].text
     access = dom.xpath(dl +'/dd[8]/text()')
+    access = ', '.join(str(e) for e in access)
     return {
         "商号": business_name,
         '所在地': location,
